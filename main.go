@@ -7,9 +7,22 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+
+	"github.com/codegangsta/cli"
 )
 
 func main() {
+	app := cli.NewApp()
+	app.Name = "ido"
+	app.Usage = "Not yet"
+	app.Action = func(c *cli.Context) {
+		post(scanStdout())
+	}
+	app.Commands = Commands
+	app.Run(os.Args)
+}
+
+func scanStdout() string {
 	var lines bytes.Buffer
 	scanner := bufio.NewScanner(os.Stdin)
 

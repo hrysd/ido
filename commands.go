@@ -1,11 +1,13 @@
 package main
 
 import (
-	"ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/codegangsta/cli"
 )
+
+const FILENAME = ".ido"
 
 var Commands = []cli.Command{
 	setCommand,
@@ -28,4 +30,8 @@ func doSet(c *cli.Context) {
 func storeTokenWithName(name string, token string) {
 	homeDirectory := os.Getenv("HOME")
 	ioutil.WriteFile(".ido")
+}
+
+func configurationPath() string {
+	return filepath.Join(os.Getenv("HOME"), FILENAME)
 }

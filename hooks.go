@@ -6,13 +6,10 @@ import (
 	"os"
 	"path/filepath"
     "fmt"
+    "sort"
 )
 
 const CONFIGURATION_FILENAME = ".ido"
-
-type Hooks struct {
-    Hooks []Hook
-}
 
 type Hook struct {
     Name string `json:"name"`
@@ -31,7 +28,7 @@ func LoadHooks() {
 		return
 	}
 
-    hooks := Hooks{}
+    var hooks []Hook
 	errr := json.Unmarshal(fileContent, &hooks)
     
     if errr != nil {
@@ -40,6 +37,12 @@ func LoadHooks() {
     }
     
     fmt.Println(hooks)
+    
+    i := sort.Search(len(hooks), func(i int) bool {
+        return hooks[i].Name == "hrysd"
+    })
+    
+    fmt.Println(hooks[i])
 }
 func configurationPath() string {
 	return filepath.Join(os.Getenv("HOME"), CONFIGURATION_FILENAME)

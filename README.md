@@ -24,3 +24,9 @@ then just redirect stdout to `ido` command.
 ```
 $ cat ~/.vimrc | ido hoi
 ```
+
+## Installation
+
+```
+$ go get github.com/hrysd/ido
+```

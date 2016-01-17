@@ -15,10 +15,15 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "ido"
 	app.Usage = "Not yet"
-	app.Action = func(c *cli.Context) {
-		post(scanStdout())
+    app.Commands = Commands
+	
+    app.Action = func(c *cli.Context) {
+        hookName := c.Args().Get(0)
+		hook := DetectHook(hookName)
+
+        post(hook.Token, scanStdout())
 	}
-	app.Commands = Commands
+
 	app.Run(os.Args)
 }
 
@@ -36,7 +41,7 @@ func scanStdout() string {
 
 	lines.Write([]byte("\n```"))
 
-	post(os.Args[1], lines.String())
+	return lines.String()
 }
 
 func post(endpoint string, content string) {

@@ -5,45 +5,57 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-    "fmt"
-    "sort"
 )
 
 const CONFIGURATION_FILENAME = ".ido"
 
 type Hook struct {
-    Name string `json:"name"`
-    Token string `json:"token"`
+	Name  string `json:"name"`
+	Token string `json:"token"`
 }
 
-func main() {
-	LoadHooks()
-}
+type Hooks []Hook
 
-func LoadHooks() {
-	fileContent, err := ioutil.ReadFile(configurationPath())
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-    var hooks []Hook
-	errr := json.Unmarshal(fileContent, &hooks)
+func DetectHook(hookName string) Hook {
+	hooks := LoadHooks()
+    hook := hooks.Detect(hookName)
     
-    if errr != nil {
-        fmt.Println(errr)
-        return
+    return hook
+}
+
+func LoadHooks() Hooks {
+    var hooks Hooks 
+    err := json.Unmarshal(readHookData(), &hooks)
+    
+    if err != nil {
+        panic(err)
+    }
+
+    return hooks
+}
+
+func (self Hooks)Detect(hookName string) Hook {
+    var hook Hook
+    
+    for _, h := range self {
+		if h.Name == hookName {
+			hook = h
+		}
+	}
+    
+    return hook
+}
+
+func readHookData() []byte {
+    fileContent, err := ioutil.ReadFile(configurationPath())
+    
+    if err != nil {
+        panic(err)
     }
     
-    fmt.Println(hooks)
-    
-    i := sort.Search(len(hooks), func(i int) bool {
-        return hooks[i].Name == "hrysd"
-    })
-    
-    fmt.Println(hooks[i])
+    return fileContent
 }
+
 func configurationPath() string {
 	return filepath.Join(os.Getenv("HOME"), CONFIGURATION_FILENAME)
 }

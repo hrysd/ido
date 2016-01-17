@@ -1,8 +1,6 @@
 package main
 
 import (
-	"net/http"
-	"net/url"
 	"os"
 
 	"github.com/codegangsta/cli"
@@ -19,19 +17,8 @@ func main() {
 		hookName := c.Args().Get(0)
 		hook := DetectHook(hookName)
 
-		post(hook.Token, pipe.Read())
+		hook.Post(pipe.Read())
 	}
 
 	app.Run(os.Args)
-}
-
-func post(endpoint string, content string) {
-	values := url.Values{}
-	values.Add("source", content)
-
-	_, err := http.PostForm(endpoint, values)
-
-	if err != nil {
-		panic(err) // XXX
-	}
 }

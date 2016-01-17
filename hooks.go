@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"net/http"
+	"net/url"
 
 	"github.com/hrysd/ido/internal/configuration"
 )
@@ -9,6 +11,17 @@ import (
 type Hook struct {
 	Name  string `json:"name"`
 	Token string `json:"token"`
+}
+
+func (self Hook) Post(content string) {
+	values := url.Values{}
+	values.Add("source", content)
+
+	_, err := http.PostForm(self.Token, values)
+
+	if err != nil {
+		panic(err) // XXX
+	}
 }
 
 type Hooks []Hook

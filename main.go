@@ -1,41 +1,24 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
-	"fmt"
-	"net/http"
-	"net/url"
 	"os"
+
+	"github.com/codegangsta/cli"
+	"github.com/hrysd/ido/internal/pipe"
 )
 
 func main() {
-	var lines bytes.Buffer
-	scanner := bufio.NewScanner(os.Stdin)
+	app := cli.NewApp()
+	app.Name = "ido"
+	app.Usage = "Not yet"
+	app.Commands = Commands
 
-	lines.Write([]byte("```\n"))
+	app.Action = func(c *cli.Context) {
+		hookName := c.Args().Get(0)
+		hook := DetectHook(hookName)
 
-	for scanner.Scan() {
-		fmt.Println(scanner.Text())
-		lines.Write(scanner.Bytes())
-		lines.Write([]byte("\n"))
+		hook.Post(pipe.Read())
 	}
 
-	lines.Write([]byte("\n```"))
-
-	post(os.Args[1], lines.String())
-}
-
-func post(endpoint string, content string) {
-	values := url.Values{}
-	values.Add("source", content)
-
-	response, err := http.PostForm(endpoint, values)
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Println(response)
+	app.Run(os.Args)
 }

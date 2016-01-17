@@ -15,13 +15,13 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "ido"
 	app.Usage = "Not yet"
-    app.Commands = Commands
-	
-    app.Action = func(c *cli.Context) {
-        hookName := c.Args().Get(0)
+	app.Commands = Commands
+
+	app.Action = func(c *cli.Context) {
+		hookName := c.Args().Get(0)
 		hook := DetectHook(hookName)
 
-        post(hook.Token, scanStdout())
+		post(hook.Token, scanStdout())
 	}
 
 	app.Run(os.Args)
@@ -48,12 +48,9 @@ func post(endpoint string, content string) {
 	values := url.Values{}
 	values.Add("source", content)
 
-	response, err := http.PostForm(endpoint, values)
+	_, err := http.PostForm(endpoint, values)
 
 	if err != nil {
-		fmt.Println(err)
-		return
+		panic(err) // XXX
 	}
-
-	fmt.Println(response)
 }

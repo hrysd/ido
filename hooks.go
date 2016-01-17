@@ -2,12 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-)
 
-const CONFIGURATION_FILENAME = ".ido"
+	"github.com/hrysd/ido/internal/utils"
+)
 
 type Hook struct {
 	Name  string `json:"name"`
@@ -16,46 +13,36 @@ type Hook struct {
 
 type Hooks []Hook
 
-func DetectHook(hookName string) Hook {
-	hooks := LoadHooks()
-    hook := hooks.Detect(hookName)
-    
-    return hook
-}
+func (self Hooks) DetectByName(hookName string) Hook {
+	var hook Hook
 
-func LoadHooks() Hooks {
-    var hooks Hooks 
-    err := json.Unmarshal(readHookData(), &hooks)
-    
-    if err != nil {
-        panic(err)
-    }
-
-    return hooks
-}
-
-func (self Hooks)Detect(hookName string) Hook {
-    var hook Hook
-    
-    for _, h := range self {
+	for _, h := range self {
 		if h.Name == hookName {
 			hook = h
 		}
 	}
-    
-    return hook
+
+	if hook.Name == "" {
+		panic("Can not detect hook")
+	}
+
+	return hook
 }
 
-func readHookData() []byte {
-    fileContent, err := ioutil.ReadFile(configurationPath())
-    
-    if err != nil {
-        panic(err)
-    }
-    
-    return fileContent
+func DetectHook(hookName string) Hook {
+	hooks := loadHooks()
+	hook := hooks.DetectByName(hookName)
+
+	return hook
 }
 
-func configurationPath() string {
-	return filepath.Join(os.Getenv("HOME"), CONFIGURATION_FILENAME)
+func loadHooks() Hooks {
+	var hooks Hooks
+	err := json.Unmarshal(configuration.Read(), &hooks)
+
+	if err != nil {
+		panic(err) // XXX
+	}
+
+	return hooks
 }

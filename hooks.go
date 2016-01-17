@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 
-	"github.com/hrysd/ido/internal/utils"
+	"github.com/hrysd/ido/internal/configuration"
 )
 
 type Hook struct {

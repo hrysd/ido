@@ -1,14 +1,12 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
-	"fmt"
 	"net/http"
 	"net/url"
 	"os"
 
 	"github.com/codegangsta/cli"
+	"github.com/hrysd/ido/internal/pipe"
 )
 
 func main() {
@@ -21,27 +19,10 @@ func main() {
 		hookName := c.Args().Get(0)
 		hook := DetectHook(hookName)
 
-		post(hook.Token, scanStdout())
+		post(hook.Token, pipe.Read())
 	}
 
 	app.Run(os.Args)
-}
-
-func scanStdout() string {
-	var lines bytes.Buffer
-	scanner := bufio.NewScanner(os.Stdin)
-
-	lines.Write([]byte("```\n"))
-
-	for scanner.Scan() {
-		fmt.Println(scanner.Text())
-		lines.Write(scanner.Bytes())
-		lines.Write([]byte("\n"))
-	}
-
-	lines.Write([]byte("\n```"))
-
-	return lines.String()
 }
 
 func post(endpoint string, content string) {

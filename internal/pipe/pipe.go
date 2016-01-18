@@ -3,8 +3,8 @@ package pipe
 import (
 	"bufio"
 	"bytes"
-    "os"
-    "fmt"
+	"fmt"
+	"os"
 )
 
 func Read() string {

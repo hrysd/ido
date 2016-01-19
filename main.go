@@ -15,6 +15,11 @@ func main() {
 
 	app.Action = func(c *cli.Context) {
 		hookName := c.Args().Get(0)
+
+		if hookName == "" {
+			return
+		}
+
 		hook := DetectHook(hookName)
 
 		hook.Post(pipe.Read())

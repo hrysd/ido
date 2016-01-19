@@ -49,6 +49,10 @@ func DetectHook(hookName string) Hook {
 	return hook
 }
 
+func AllHooks() Hooks {
+	return loadHooks()
+}
+
 func loadHooks() Hooks {
 	var hooks Hooks
 	err := json.Unmarshal(configuration.Read(), &hooks)

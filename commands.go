@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/user"
+	"path/filepath"
 
 	"github.com/bgentry/speakeasy"
 	"github.com/codegangsta/cli"
+	"github.com/dickeyxxx/netrc"
 )
 
 var Commands = []cli.Command{
@@ -104,7 +107,7 @@ func getToken(email string, password string) {
 
 	decorder := json.NewDecoder(response.Body)
 
-	token := Token{}
+	var token Token
 
 	err = decorder.Decode(&token)
 
@@ -113,5 +116,35 @@ func getToken(email string, password string) {
 		os.Exit(1)
 	}
 
-	fmt.Println("%#v", token)
+	n := getNetrc()
+	n.RemoveMachine("idobata.io")
+	n.AddMachine("idobata.io", email, token)
+	n.Machine("idobata.io").Set("token", token.AccessToken)
+	n.Save()
+}
+
+func netrcPath() string {
+	user, err := user.Current()
+
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	return filepath.Join(user.HomeDir, ".netrc")
+}
+
+func getNetrc() *netrc.Netrc {
+	n, err := netrc.Parse(netrcPath())
+
+	if err != nil {
+		if _, ok := err.(*os.PathError); ok {
+			return &netrc.Netrc{Path: netrcPath()}
+		}
+
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	return n
 }

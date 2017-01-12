@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -96,20 +95,18 @@ func getToken(email string, password string) {
 
 	response, err := http.Post("https://idobata.io/oauth/token", "application/json", bytes.NewBuffer(params))
 
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
-	body, err := ioutil.ReadAll(response.Body)
+	defer response.Body.Close()
 
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
+
+	decorder := json.NewDecoder(response.Body)
 
 	token := Token{}
-	err = json.Unmarshal(body, &token)
+
+	err = decorder.Decode(&token)
 
 	if err != nil {
 		fmt.Println(err.Error())

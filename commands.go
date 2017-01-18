@@ -78,38 +78,9 @@ func passwordPrompt(label string) string {
 	return password
 }
 
-type Params struct {
-	GrantType string `json:"grant_type"`
-	UserName  string `json:"username"`
-	Password  string `json:"password"`
-}
-
-type Token struct {
-	TokenType   string `json:"token_type"`
-	CreatedAt   int    `json:"created_at"`
-	AccessToken string `json:"access_token"`
-}
-
 func getToken(email string, password string) {
 	// TODO:
-	params, _ := json.Marshal(Params{GrantType: "password", UserName: email, Password: password})
-
-	fmt.Println(string(params))
-
-	response, err := http.Post("https://idobata.io/oauth/token", "application/json", bytes.NewBuffer(params))
-
-	defer response.Body.Close()
-
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
-	decorder := json.NewDecoder(response.Body)
-
-	var token Token
-
-	err = decorder.Decode(&token)
+  token, err := idobata.GetToken(email, password)
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -118,8 +89,7 @@ func getToken(email string, password string) {
 
 	n := getNetrc()
 	n.RemoveMachine("idobata.io")
-	n.AddMachine("idobata.io", email, token)
-	n.Machine("idobata.io").Set("token", token.AccessToken)
+	n.AddMachine("idobata.io", email, token.AccessToken)
 	n.Save()
 }
 

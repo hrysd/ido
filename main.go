@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/hrysd/ido/internal/pipe"
+	//"github.com/hrysd/ido/internal/pipe"
 )
 
 func main() {
@@ -14,15 +14,10 @@ func main() {
 	app.Commands = Commands
 
 	app.Action = func(c *cli.Context) {
-		hookName := c.Args().Get(0)
+		//hookName := c.Args().Get(0)
 
-		if hookName == "" {
-			return
-		}
-
-		hook := DetectHook(hookName)
-
-		hook.Post(pipe.Read())
+    room := idobata.GetRooms("esminc", "hrysd").Rooms[0]
+		idobata.CreateMessage("hoge", room.id)
 	}
 
 	app.Run(os.Args)
